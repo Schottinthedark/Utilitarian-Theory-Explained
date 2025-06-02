@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilitarian Ethics Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            color: #2d5a3d;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(45, 90, 61, 0.1);
+            border: 2px solid #4a7c59;
+        }
+
+        .header h1 {
+            color: #2d5a3d;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(45, 90, 61, 0.1);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #4a7c59;
+            font-weight: 500;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 4px 15px rgba(45, 90, 61, 0.1);
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            margin: 0 4px;
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #4a7c59;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .nav-tab:hover {
+            background: #e8f5e8;
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: #4a7c59;
+            color: white;
+            border-color: #2d5a3d;
+            box-shadow: 0 4px 12px rgba(45, 90, 61, 0.3);
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(45, 90, 61, 0.1);
+            border: 2px solid #e8f5e8;
+            margin-bottom: 20px;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card {
+            background: #f8fdf8;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 5px solid #4a7c59;
+            box-shadow: 0 4px 15px rgba(45, 90, 61, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 20px rgba(45, 90, 61, 0.1);
+        }
+
+        .question-card h3 {
+            color: #2d5a3d;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .scenario-selector {
+            margin: 20px 0;
+        }
+
+        .scenario-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .scenario-btn {
+            background: white;
+            border: 2px solid #4a7c59;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+            color: #2d5a3d;
+        }
+
+        .scenario-btn:hover {
+            background: #4a7c59;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(45, 90, 61, 0.2);
+        }
+
+        .scenario-btn.active {
+            background: #2d5a3d;
+            color: white;
+            border-color: #1a3d28;
+        }
+
+        .analysis-panel {
+            background: #f0f8f0;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 2px solid #4a7c59;
+            display: none;
+        }
+
+        .analysis-panel.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .consequences-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .consequence-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e8f5e8;
+            transition: all 0.3s ease;
+        }
+
+        .consequence-card:hover {
+            border-color: #4a7c59;
+            box-shadow: 0 4px 15px rgba(45, 90, 61, 0.1);
+        }
+
+        .consequence-card h4 {
+            color: #2d5a3d;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .utility-meter {
+            background: #e8f5e8;
+            height: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .utility-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcf7f);
+            border-radius: 5px;
+            transition: width 0.8s ease;
+        }
+
+        .reference-section {
+            background: #f8fdf8;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4a7c59;
+            margin-top: 30px;
+        }
+
+        .reference-section h3 {
+            color: #2d5a3d;
+            margin-bottom: 15px;
+        }
+
+        .methodology-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #4a7c59;
+            margin: 20px 0;
+        }
+
+        .interactive-slider {
+            margin: 20px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e8f5e8;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4a7c59;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4a7c59;
+            cursor: pointer;
+            border: none;
+        }
+
+        .pain-pleasure-section {
+            background: #fff5f5;
+            border: 2px solid #ff6b6b;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .approaches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .approach-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #4a7c59;
+            text-align: center;
+        }
+
+        .approach-card h4 {
+            color: #2d5a3d;
+            margin-bottom: 15px;
+        }
+
+        .accordion {
+            margin: 20px 0;
+        }
+
+        .accordion-item {
+            background: white;
+            border: 2px solid #e8f5e8;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-item:hover {
+            border-color: #4a7c59;
+            box-shadow: 0 4px 15px rgba(45, 90, 61, 0.1);
+        }
+
+        .accordion-header {
+            background: #f8fdf8;
+            padding: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2d5a3d;
+            border-bottom: 2px solid #e8f5e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: #f0f8f0;
+        }
+
+        .accordion-header.active {
+            background: #4a7c59;
+            color: white;
+            border-bottom-color: #4a7c59;
+        }
+
+        .accordion-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-content.active {
+            max-height: 1000px;
+        }
+
+        .accordion-body {
+            padding: 20px;
+            color: #2d5a3d;
+            line-height: 1.6;
+        }
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-tab {
+                margin: 2px 0;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .scenario-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .consequences-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Utilitarian Ethics Explorer</h1>
+            <p>Interactive Analysis of Consequentialist Moral Philosophy</p>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showSection('theory')">Theory Overview</div>
+            <div class="nav-tab" onclick="showSection('methods')">Methods & Types</div>
+            <div class="nav-tab" onclick="showSection('scenarios')">Moral Scenarios</div>
+        </div>
+
+        <!-- Theory Overview Section -->
+        <div id="theory" class="content-section active">
+            <div class="question-card">
+                <h3>📖 What is Utilitarianism?</h3>
+                <div class="methodology-box">
+                    <p><strong>Core Principle:</strong> An action is morally right if it produces the greatest good for the greatest number of people.</p>
+                    
+                    <div class="approaches-grid">
+                        <div class="approach-card">
+                            <h4>🎯 Consequentialism</h4>
+                            <p>Judges actions solely by their outcomes and consequences, not by intentions or rules</p>
+                        </div>
+                        <div class="approach-card">
+                            <h4>⚖️ Impartiality</h4>
+                            <p>Each person's happiness counts equally - no special treatment based on relationships or status</p>
+                        </div>
+                        <div class="approach-card">
+                            <h4>🧮 Maximization</h4>
+                            <p>Seeks to maximize overall well-being, happiness, or utility across all affected parties</p>
+                        </div>
+                        <div class="approach-card">
+                            <h4>📊 Quantification</h4>
+                            <p>Attempts to measure and compare different types of benefits and harms systematically</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3>🏛️ Historical Development</h3>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('bentham')">
+                            <span><strong>Jeremy Bentham (1748-1832) - Classical Utilitarianism</strong></span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content" id="bentham">
+                            <div class="accordion-body">
+                                <p><strong>"The greatest happiness for the greatest number."</strong></p>
+                                <p>Bentham developed the <em>hedonic calculus</em> to measure pleasure and pain mathematically. His system considered:</p>
+                                <ul style="margin-left: 20px;">
+                                    <li><strong>Intensity:</strong> How strong is the pleasure or pain?</li>
+                                    <li><strong>Duration:</strong> How long does it last?</li>
+                                    <li><strong>Certainty:</strong> How likely is it to occur?</li>
+                                    <li><strong>Propinquity:</strong> How soon will it occur?</li>
+                                    <li><strong>Fecundity:</strong> Will it lead to further pleasures?</li>
+                                    <li><strong>Purity:</strong> Will it lead to pains?</li>
+                                    <li><strong>Extent:</strong> How many people are affected?</li>
+                                </ul>
+                                <p>Bentham famously said that "pushpin is as good as poetry" - meaning all pleasures are equal in value.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('mill')">
+                            <span><strong>John Stuart Mill (1806-1873) - Refined Utilitarianism</strong></span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content" id="mill">
+                            <div class="accordion-body">
+                                <p><strong>"It is better to be a human being dissatisfied than a pig satisfied."</strong></p>
+                                <p>Mill distinguished between <em>higher</em> and <em>lower</em> pleasures:</p>
+                                <ul style="margin-left: 20px;">
+                                    <li><strong>Higher Pleasures:</strong> Intellectual, moral, and aesthetic pleasures (poetry, philosophy, art)</li>
+                                    <li><strong>Lower Pleasures:</strong> Physical and sensual pleasures (food, sex, comfort)</li>
+                                </ul>
+                                <p>Mill argued that someone who has experienced both types will always prefer the higher pleasures, even if they come with some dissatisfaction. He also developed the <em>harm principle</em>: actions are wrong only if they harm others.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('modern')">
+                            <span><strong>Modern Developments (20th-21st Century)</strong></span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content" id="modern">
+                            <div class="accordion-body">
+                                <p><strong>Contemporary philosophers have expanded and refined utilitarian theory:</strong></p>
+                                <ul style="margin-left: 20px;">
+                                    <li><strong>Peter Singer:</strong> Applied utilitarianism to animal rights and global poverty</li>
+                                    <li><strong>Preference Utilitarianism:</strong> Focus on satisfying preferences rather than just happiness</li>
+                                    <li><strong>Negative Utilitarianism:</strong> Prioritize reducing suffering over increasing happiness</li>
+                                    <li><strong>Two-Level Utilitarianism:</strong> Combine intuitive moral rules with utilitarian calculations</li>
+                                </ul>
+                                <p>Modern utilitarians also grapple with issues like global justice, environmental ethics, and the ethics of artificial intelligence.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Methods & Types Section -->
+        <div id="methods" class="content-section">
+            <div class="question-card">
+                <h3>🔧 Utilitarian Analysis Framework</h3>
+                
+                <div class="methodology-box">
+                    <h4>Step-by-Step Decision Making Process:</h4>
+                    
+                    <div style="display: grid; gap: 20px; margin-top: 20px;">
+                        <div style="background: #f8fdf8; padding: 15px; border-radius: 8px; border-left: 4px solid #4a7c59;">
+                            <strong>1. Identify Stakeholders</strong>
+                            <p>List all individuals, groups, and entities affected by the action, including future generations and non-human animals where relevant.</p>
+                        </div>
+                        
+                        <div style="background: #f8fdf8; padding: 15px; border-radius: 8px; border-left: 4px solid #4a7c59;">
+                            <strong>2. Predict Consequences</strong>
+                            <p>Use empirical evidence, expert judgment, and logical reasoning to forecast likely outcomes for each stakeholder.</p>
+                        </div>
+                        
+                        <div style="background: #f8fdf8; padding: 15px; border-radius: 8px; border-left: 4px solid #4a7c59;">
+                            <strong>3. Measure Utility</strong>
+                            <p>Quantify the welfare impact using measures like happiness, preference satisfaction, or objective well-being indicators.</p>
+                        </div>
+                        
+                        <div style="background: #f8fdf8; padding: 15px; border-radius: 8px; border-left: 4px solid #4a7c59;">
+                            <strong>4. Calculate Net Benefit</strong>
+                            <p>Sum positive and negative utilities across all stakeholders and time periods to determine net social benefit.</p>
+                        </div>
+                        
+                        <div style="background: #f8fdf8; padding: 15px; border-radius: 8px; border-left: 4px solid #4a7c59;">
+                            <strong>5. Consider Uncertainty</strong>
+                            <p>Apply appropriate weighting for probability and confidence levels, potentially using expected utility calculations.</p>
+                        </div>
+                        
+                        <div style="background: #f8fdf8; padding: 15px; border-radius: 8px; border-left: 4px solid #4a7c59;">
+                            <strong>6. Compare Alternatives</strong>
+                            <p>Evaluate other possible actions using the same framework and choose the option with highest expected utility.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3>⚡ Types of Utilitarianism</h3>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('act-util')">
+                            <span><strong>🎯 Act Utilitarianism</strong></span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content" id="act-util">
+                            <div class="accordion-body">
+                                <p><strong>Evaluate each individual action based on its specific consequences in that particular situation.</strong></p>
+                                <p><strong>Advantages:</strong></p>
+                                <ul style="margin-left: 20px;">
+                                    <li>Flexible and context-sensitive</li>
+                                    <li>Directly applies the utilitarian principle</li>
+                                    <li>Can handle unique situations effectively</li>
+                                </ul>
+                                <p><strong>Challenges:</strong></p>
+                                <ul style="margin-left: 20px;">
+                                    <li>Time-consuming to calculate for every action</li>
+                                    <li>May justify normally prohibited acts (lying, stealing) in specific cases</li>
+                                    <li>Difficult to predict all consequences</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('rule-util')">
+                            <span><strong>📋 Rule Utilitarianism</strong></span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content" id="rule-util">
+                            <div class="accordion-body">
+                                <p><strong>Follow rules that generally produce the best outcomes, even if breaking them might help in specific cases.</strong></p>
+                                <p><strong>Examples of utilitarian rules:</strong></p>
+                                <ul style="margin-left: 20px;">
+                                    <li>"Don't lie" - because honesty generally promotes trust and cooperation</li>
+                                    <li>"Keep promises" - because reliability enables social coordination</li>
+                                    <li>"Don't steal" - because property rights promote economic efficiency</li>
+                                </ul>
+                                <p><strong>Benefits:</strong> More practical for daily life, provides moral certainty, prevents exploitation of utilitarian calculations.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('pref-util')">
+                            <span><strong>🎭 Preference Utilitarianism</strong></span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content" id="pref-util">
+                            <div class="accordion-body">
+                                <p><strong>Maximize the satisfaction of people's preferences rather than just their happiness or pleasure.</strong></p>
+                                <p><strong>Key insights:</strong></p>
+                                <ul style="margin-left: 20px;">
+                                    <li>People have different conceptions of what makes life good</li>
+                                    <li>Some preferences aren't about personal happiness (e.g., justice, environmental protection)</li>
+                                    <li>Avoids the problem of comparing different types of pleasure</li>
+                                </ul>
+                                <p><strong>Challenges:</strong> What about irrational preferences? Should all preferences count equally? How do we handle conflicting preferences?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('neg-util')">
+                            <span><strong>⚫ Negative Utilitarianism</strong></span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content" id="neg-util">
+                            <div class="accordion-body">
+                                <p><strong>Focus primarily on minimizing suffering rather than maximizing happiness.</strong></p>
+                                <p><strong>Core principle:</strong> Reducing suffering is more important than increasing pleasure.</p>
+                                <p><strong>Arguments for this approach:</strong></p>
+                                <ul style="margin-left: 20px;">
+                                    <li>Suffering seems more urgent and compelling than pleasure</li>
+                                    <li>There may be no upper limit to happiness, but clear lower limits to suffering</li>
+                                    <li>Most people prioritize avoiding pain over gaining pleasure</li>
+                                </ul>
+                                <p><strong>Applications:</strong> Medical ethics, disaster relief, animal welfare, poverty reduction.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenarios Section -->
+        <div id="scenarios" class="content-section">
+            <div class="question-card">
+                <h3>🧪 How would a utilitarian approach these moral dilemmas?</h3>
+                
+                <div class="scenario-selector">
+                    <h4>Select a scenario to analyze:</h4>
+                    <div class="scenario-buttons">
+                        <div class="scenario-btn" onclick="analyzeScenario('pharma')">🐭 Pharmaceutical Animal Testing</div>
+                        <div class="scenario-btn" onclick="analyzeScenario('cosmetics')">💄 Cosmetic Animal Testing</div>
+                        <div class="scenario-btn" onclick="analyzeScenario('owl')">🦉 Spotted Owl vs. Jobs</div>
+                        <div class="scenario-btn" onclick="analyzeScenario('torture')">⚖️ Torture for National Security</div>
+                    </div>
+                </div>
+
+                <div id="analysis-pharma" class="analysis-panel">
+                    <h4>🧬 Pharmaceutical Animal Testing</h4>
+                    <div class="consequences-grid">
+                        <div class="consequence-card">
+                            <h4>✅ Benefits</h4>
+                            <ul>
+                                <li>Life-saving medications developed</li>
+                                <li>Reduced human suffering from diseases</li>
+                                <li>Scientific knowledge advancement</li>
+                                <li>Economic benefits to society</li>
+                            </ul>
+                            <div class="utility-meter"><div class="utility-fill" style="width: 85%"></div></div>
+                        </div>
+                        <div class="consequence-card">
+                            <h4>❌ Costs</h4>
+                            <ul>
+                                <li>Animal suffering and death</li>
+                                <li>Moral costs of causing harm</li>
+                                <li>Potential for unnecessary testing</li>
+                                <li>Resource allocation concerns</li>
+                            </ul>
+                            <div class="utility-meter"><div class="utility-fill" style="width: 35%"></div></div>
+                        </div>
+                    </div>
+                    <p><strong>Utilitarian Verdict:</strong> Generally justified when the medical benefits significantly outweigh animal suffering, especially for serious diseases. Emphasis on minimizing harm through better methods and stricter oversight.</p>
+                </div>
+
+                <div id="analysis-cosmetics" class="analysis-panel">
+                    <h4>💋 Cosmetic Animal Testing</h4>
+                    <div class="consequences-grid">
+                        <div class="consequence-card">
+                            <h4>✅ Benefits</h4>
+                            <ul>
+                                <li>Product safety assurance</li>
+                                <li>Consumer confidence</li>
+                                <li>Economic activity in beauty industry</li>
+                                <li>Some psychological benefits from cosmetics</li>
+                            </ul>
+                            <div class="utility-meter"><div class="utility-fill" style="width: 25%"></div></div>
+                        </div>
+                        <div class="consequence-card">
+                            <h4>❌ Costs</h4>
+                            <ul>
+                                <li>Animal suffering for non-essential products</li>
+                                <li>Availability of alternative testing methods</li>
+                                <li>Moral cost of unnecessary harm</li>
+                                <li>Resource misallocation</li>
+                            </ul>
+                            <div class="utility-meter"><div class="utility-fill" style="width: 70%"></div></div>
+                        </div>
+                    </div>
+                    <p><strong>Utilitarian Verdict:</strong> Generally unjustified. The benefits (aesthetic enhancement) do not outweigh the animal suffering, especially given available alternatives. Most utilitarians would oppose this practice.</p>
+                </div>
+
+                <div id="analysis-owl" class="analysis-panel">
+                    <h4>🌲 Spotted Owl Habitat vs. Lumber Jobs</h4>
+                    <div class="consequences-grid">
+                        <div class="consequence-card">
+                            <h4>🦉 Protecting Habitat</h4>
+                            <ul>
+                                <li>Species preservation</li>
+                                <li>Ecosystem maintenance</li>
+                                <li>Long-term environmental benefits</li>
+                                <li>Future generation welfare</li>
+                            </ul>
+                            <div class="utility-meter"><div class="utility-fill" style="width: 75%"></div></div>
+                        </div>
+                        <div class="consequence-card">
+                            <h4>👷 Preserving Jobs</h4>
+                            <ul>
+                                <li>Immediate economic welfare</li>
+                                <li>Community stability</li>
+                                <li>Individual livelihoods</li>
+                                <li>Short-term social cohesion</li>
+                            </ul>
+                            <div class="utility-meter"><div class="utility-fill" style="width: 60%"></div></div>
+                        </div>
+                    </div>
+                    <p><strong>Utilitarian Verdict:</strong> Complex calculation depending on time frame and alternatives. Long-term environmental benefits and irreversible species loss often outweigh short-term economic costs, especially if job retraining and economic transition support are provided.</p>
+                </div>
+
+                <div id="analysis-torture" class="analysis-panel">
+                    <h4>🔐 Torture for National Security</h4>
+                    <div class="consequences-grid">
+                        <div class="consequence-card">
+                            <h4>⚠️ Claimed Benefits</h4>
+                            <ul>
+                                <li>Potential information gathering</li>
+                                <li>Possible prevention of attacks</li>
+                                <li>National security enhancement</li>
+                                <li>Deterrent effect</li>
+                            </ul>
+                            <div class="utility-meter"><div class="utility-fill" style="width: 20%"></div></div>
+                        </div>
+                        <div class="consequence-card">
+                            <h4>🚫 Severe Costs</h4>
+                            <ul>
+                                <li>Extreme individual suffering</li>
+                                <li>Unreliable information from torture</li>
+                                <li>Moral degradation of society</li>
+                                <li>International law violations</li>
+                                <li>Precedent for abuse</li>
+                            </ul>
+                            <div class="utility-meter"><div class="utility-fill" style="width: 95%"></div></div>
+                        </div>
+                    </div>
+                    <p><strong>Utilitarian Verdict:</strong> Overwhelmingly rejected. Torture causes extreme suffering, produces unreliable information, and creates dangerous precedents. The hypothetical benefits rarely if ever justify the certain and severe costs.</p>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Activate clicked tab
+            event.target.classList.add('active');
+        }
+
+        function analyzeScenario(scenario) {
+            // Remove active class from all scenario buttons
+            const buttons = document.querySelectorAll('.scenario-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Hide all analysis panels
+            const panels = document.querySelectorAll('.analysis-panel');
+            panels.forEach(panel => panel.classList.remove('active'));
+            
+            // Activate clicked button
+            event.target.classList.add('active');
+            
+            // Show corresponding analysis
+            document.getElementById('analysis-' + scenario).classList.add('active');
+        }
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const header = event.currentTarget;
+            const icon = header.querySelector('.accordion-icon');
+            
+            // Close all other accordions
+            const allContents = document.querySelectorAll('.accordion-content');
+            const allHeaders = document.querySelectorAll('.accordion-header');
+            const allIcons = document.querySelectorAll('.accordion-icon');
+            
+            allContents.forEach(item => {
+                if (item !== content) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            allHeaders.forEach(item => {
+                if (item !== header) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            allIcons.forEach(item => {
+                if (item !== icon) {
+                    item.classList.remove('rotated');
+                }
+            });
+            
+            // Toggle current accordion
+            content.classList.toggle('active');
+            header.classList.toggle('active');
+            icon.classList.toggle('rotated');
+        }
+
+        // Initialize with default values
+        document.addEventListener('DOMContentLoaded', function() {
+            // No need for certainty slider initialization
+        });
+    </script>
+</body>
+</html>
